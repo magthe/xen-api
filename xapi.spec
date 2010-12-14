@@ -12,7 +12,7 @@ URL:  http://www.xen.org
 Source0: xapi-%{version}.tar.bz2
 #Patch0: xapi-version.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-BuildRequires: pam-devel tetex xapi-libs-devel ocaml omake ocaml-findlib ocaml-xmlm
+BuildRequires: pam-devel tetex xapi-libs-devel ocaml omake ocaml-findlib ocaml-xmlm lynx tetex-latex
 
 %description
 XCP toolstack.
