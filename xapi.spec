@@ -10,7 +10,7 @@ Group:   System/Hypervisor
 License: LGPL+linking exception
 URL:  http://www.xen.org
 Source0: xapi-%{version}.tar.bz2
-Patch0: xapi-version.patch
+#Patch0: xapi-version.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: pam-devel tetex xapi-libs-devel ocaml omake ocaml-findlib ocaml-xmlm
 
@@ -92,7 +92,7 @@ This package contains Xen-API documentation and examples in several programming 
 
 %prep 
 %setup -q
-%patch0 -p0 -b xapi-version.patch
+#%patch0 -p0 -b xapi-version.patch
 
 %build
 COMPILE_JAVA=no %{__make}
