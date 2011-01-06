@@ -2253,6 +2253,22 @@ add a mapping of 'path' -> '/tmp', the command line should contain the argument 
 			; implementation = No_fd Cli_operations.secret_destroy
 			; flags = []
 			};
+
+		"credential-create",
+			{ reqd = ["username"; "pword"]
+			; optn = ["other-config"]
+			; help = "Create a credential"
+			; implementation = No_fd Cli_operations.credential_create
+			; flags = []
+			};
+		"credential-destroy",
+			{ reqd = ["uuid"]
+			; optn = []
+			; help = "Destroy a credential"
+			; implementation = No_fd Cli_operations.credential_destroy
+			; flags = []
+			};
+
     "vmpp-create",
     {
       reqd=["name-label";"backup-type";"backup-frequency"];

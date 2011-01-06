@@ -1384,6 +1384,36 @@ let secret_record rpc session_id secret =
 		]
 	}
 
+let credential_record rpc session_id credential =
+	let _ref = ref credential in
+	let empty_record = ToGet (fun () ->
+		Client.Credential.get_record ~rpc ~session_id ~self:!_ref) in
+	let record = ref empty_record in
+	let x () = lzy_get record in
+	{ setref = (fun r -> _ref := r; record := empty_record )
+	; setrefrec = (fun (a, b) -> _ref := a; record := Got b )
+	; record = x
+	; getref = (fun () -> !_ref )
+	; fields =
+		[ make_field ~name:"uuid"
+			~get:(fun () -> (x ()).API.credential_uuid) ()
+		; make_field ~name:"username"
+			~get:(fun () -> (x ()).API.credential_username)
+			~set:(fun x -> Client.Credential.set_username ~rpc ~session_id ~self:!_ref ~value:x)
+			()
+		; make_field ~name:"pword"
+			~get:(fun () -> (x ()).API.credential_pword)
+			~set:(fun x -> Client.Credential.set_pword ~rpc ~session_id ~self:!_ref ~value:x)
+			()
+		; make_field ~name:"other-config"
+			~get:(fun () -> Record_util.s2sm_to_string "; " (x ()).API.credential_other_config)
+			~add_to_map:(fun k v -> Client.Credential.add_to_other_config rpc session_id credential k v)
+			~remove_from_map:(fun k -> Client.Credential.remove_from_other_config rpc session_id credential k) 
+			~get_map:(fun () -> (x ()).API.credential_other_config)
+			()
+		]
+	}
+
 (*let record_from_ref rpc session_id ref =
   let all = [
     "PBD",(fun ref -> snd (pbd_record rpc session_id (Ref.of_string ref))); 

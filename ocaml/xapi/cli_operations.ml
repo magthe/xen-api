@@ -721,6 +721,7 @@ let gen_cmds rpc session_id =
 		 *)
 		(make_param_funs (Client.Message.get_all) (Client.Message.get_all_records_where) (Client.Message.get_by_uuid) (message_record) "message" [] [] rpc session_id)
 	@ (make_param_funs (Client.Secret.get_all) (Client.Secret.get_all_records_where) (Client.Secret.get_by_uuid) (secret_record) "secret" [] [] rpc session_id)
+	@ (make_param_funs (Client.Credential.get_all) (Client.Credential.get_all_records_where) (Client.Credential.get_by_uuid) (credential_record) "credential" [] ["uuid"; "username"; "pword"] rpc session_id)
 		(*
 		  @ (make_param_funs (Client.Alert.get_all) (Client.Alert.get_all_records_where) (Client.Alert.get_by_uuid) (alert_record) "alert" [] ["uuid";"message";"level";"timestamp";"system";"task"] rpc session_id)
 		 *)
@@ -1513,6 +1514,7 @@ let event_wait_gen rpc session_id classname record_matches =
 				| "role" -> List.map (fun x -> (role_record rpc session_id x).fields) (Client.Role.get_all rpc session_id)
 				| "vmpp" -> List.map (fun x -> (vmpp_record rpc session_id x).fields) (Client.VMPP.get_all rpc session_id)
 				| "secret" -> List.map (fun x -> (secret_record rpc session_id x).fields) (Client.Secret.get_all rpc session_id)
+				| "credential" -> List.map (fun x -> (credential_record rpc session_id x).fields) (Client.Credential.get_all rpc session_id)
 					(*				| "alert" -> List.map (fun x -> (alert_record rpc session_id x).fields) (Client.Alert.get_all rpc session_id) *)
 				| _ -> failwith ("Cli listening for class '"^classname^"' not currently implemented")
 		in
@@ -1553,6 +1555,7 @@ let event_wait_gen rpc session_id classname record_matches =
 									| Event_helper.Task (r,x) -> let record = task_record rpc session_id r in record.setrefrec (r,x); record.fields
 									| Event_helper.VMPP (r,x) -> let record = vmpp_record rpc session_id r in record.setrefrec (r,x); record.fields
 									| Event_helper.Secret (r,x) -> let record = secret_record rpc session_id r in record.setrefrec (r,x); record.fields
+									| Event_helper.Credential (r,x) -> let record = credential_record rpc session_id r in record.setrefrec (r,x); record.fields
 									| _ -> failwith ("Cli listening for class '"^classname^"' not currently implemented")
 								in
 								let record = List.map (fun r -> (r.name,fun () -> safe_get_field r)) tbl in
@@ -3903,6 +3906,19 @@ let secret_destroy printer rpc session_id params =
 	let uuid = List.assoc "uuid" params in
 	let ref = Client.Secret.get_by_uuid ~rpc ~session_id ~uuid in
 	Client.Secret.destroy ~rpc ~session_id ~self:ref
+
+let credential_create printer rpc session_id params =
+	let un = List.assoc "username" params in
+	let pword = List.assoc "pword" params in
+	let other_config = read_map_params "other-config" params in
+	let ref = Client.Credential.create ~rpc ~session_id ~username:un ~pword ~other_config in
+	let uuid = Client.Credential.get_uuid ~rpc ~session_id ~self:ref in
+	printer (Cli_printer.PList [uuid])
+
+let credential_destroy printer rpc session_id params =
+	let uuid = List.assoc "uuid" params in
+	let ref = Client.Credential.get_by_uuid ~rpc ~session_id ~uuid in
+	Client.Credential.destroy ~rpc ~session_id ~self:ref
 
 let regenerate_built_in_templates printer rpc session_id params =
 	Create_templates.create_all_templates rpc session_id

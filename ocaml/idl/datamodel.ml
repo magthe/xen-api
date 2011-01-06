@@ -90,6 +90,7 @@ let _subject = "subject"
 let _role = "role"
 let _secret = "secret"
 let _tunnel = "tunnel"
+let _credential = "credential"
 
 
 (** All the various static role names *)
@@ -6542,6 +6543,28 @@ let secret =
 			]
 		()
 
+let credential = create_obj
+	~descr:"Credentials"
+	~doccomments:[]
+	~gen_constructor_destructor:true
+	~gen_events:false
+	~in_db:true
+	~in_oss_since:None
+	~in_product_since:rel_cowley
+	~internal_deprecated_since:None
+	~messages:[]
+	~messages_default_allowed_roles:_R_POOL_OP
+	~implicit_messages_allowed_roles:_R_POOL_OP
+	~name:_credential
+	~persist:PersistEverything
+	~contents:
+		[ uid ~reader_roles:_R_POOL_OP _credential
+		; field ~reader_roles:_R_POOL_OP ~qualifier:RW ~ty:String "username" "the username (identity)"
+		; field ~reader_roles:_R_POOL_OP ~qualifier:RW ~ty:String "pword" "the password (secret)"
+		; field ~reader_roles:_R_POOL_OP ~qualifier:RW ~ty:(Map (String, String)) "other_config" "additional information" ~default_value:(Some (VMap []))
+		]
+	()
+
 (*
 
 let alert =
@@ -6610,6 +6633,7 @@ let all_system =
 		blob;
 		message;
 		secret;
+		credential;
 		tunnel;
 	]
 
@@ -6742,6 +6766,7 @@ let expose_get_all_messages_for = [
 	_subject;
 	_role;
 	_secret;
+	_credential;
 	_tunnel;
 	_vmpp;
 ]

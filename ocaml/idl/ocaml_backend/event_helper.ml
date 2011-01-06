@@ -40,6 +40,7 @@ open Pervasiveext
      | Pool of             [`pool] Ref.t *  API.pool_t
      | Message of          [`message] Ref.t * API.message_t
      | Secret of           [`secret] Ref.t * API.secret_t  
+	 | Credential of       [`credential] Ref.t * API.credential_t
      | VMPP of             [`VMPP] Ref.t * API.vMPP_t
 
   let record_of_event ev =

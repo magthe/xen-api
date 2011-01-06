@@ -3130,4 +3130,6 @@ end
   module Data_source = struct end
 
 	module Secret = Local.Secret
+
+	module Credential = Local.Credential
 end
