@@ -214,10 +214,10 @@ let encoded_auth un pw =
 
 let wlb_encoded_auth ~__context =
 	let pool = Helpers.get_pool ~__context in
-	let secret_ref = Db.Pool.get_wlb_password ~__context ~self:pool in
+	let credentials_ref = Db.Pool.get_wlb_credentials ~__context ~self:pool in
 	encoded_auth
-		(Db.Pool.get_wlb_username ~__context ~self:pool)
-		(Db.Secret.get_value ~__context ~self:secret_ref)
+		(Db.Credential.get_username ~__context ~self:credentials_ref)
+		(Db.Credential.get_pword ~__context ~self:credentials_ref)
       
 let generate_safe_param tag_name tag_value =
   Xml.to_string (Xml.Element(tag_name, [], [Xml.PCData tag_value])) 
@@ -442,12 +442,11 @@ let init_wlb ~__context ~wlb_url ~wlb_username ~wlb_password ~xenserver_username
 		(* delete if it already exists *)
 		match (data_from_leaf (descend_and_match["Id"] inner_xml)) with 
 		| _ ->
-			let old_secret_ref = Db.Pool.get_wlb_password ~__context ~self:pool in
-			let wlb_secret_ref = Xapi_secret.create ~__context ~value:wlb_password ~other_config:[] in
-			Db.Pool.set_wlb_username ~__context ~self:pool ~value:wlb_username;
-			Db.Pool.set_wlb_password ~__context ~self:pool ~value:wlb_secret_ref;
+			let old_credentials_ref = Db.Pool.get_wlb_credentials ~__context ~self:pool in
+			let wlb_credentials_ref = Xapi_credential.create ~__context ~username:wlb_username ~pword:wlb_password ~other_config:[] in
 			Db.Pool.set_wlb_url ~__context ~self:pool ~value:wlb_url;
-			Pervasiveext.ignore_exn (fun _ -> Db.Secret.destroy ~__context ~self:old_secret_ref);
+			Db.Pool.set_wlb_credentials ~__context ~self:pool ~value:wlb_credentials_ref;
+			Pervasiveext.ignore_exn (fun _ -> Db.Credential.destroy ~__context ~self:old_credentials_ref);
 	in
 	Mutex.execute request_mutex (perform_wlb_request ~enable_log:false 
 		~meth:"AddXenServer" ~params 
@@ -456,12 +455,11 @@ let init_wlb ~__context ~wlb_url ~wlb_username ~wlb_password ~xenserver_username
  
 let decon_wlb ~__context =
 	let clear_wlb_config ~__context ~pool = 
-		let secret_ref = Db.Pool.get_wlb_password ~__context ~self:pool in
-		Db.Pool.set_wlb_username ~__context ~self:pool ~value:"";
-		Db.Pool.set_wlb_password ~__context ~self:pool ~value:Ref.null;
+		let credentials_ref = Db.Pool.get_wlb_credentials ~__context ~self:pool in
+		Db.Pool.set_wlb_credentials ~__context ~self:pool ~value:Ref.null;
 		Db.Pool.set_wlb_url ~__context ~self:pool ~value:"";
 		Db.Pool.set_wlb_enabled ~__context ~self:pool ~value:false;
-		Db.Secret.destroy ~__context ~self:secret_ref
+		Db.Credential.destroy ~__context ~self:credentials_ref
 	in
 	let pool = Helpers.get_pool ~__context in
 	let handle_response inner_xml =

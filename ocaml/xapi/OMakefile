@@ -231,6 +231,7 @@ XAPI_MODULES = $(COMMON) \
 	wlb_reports \
 	remote_requests \
 	xapi_secret \
+	xapi_credential \
 	certificates \
 	../license/v6client \
 	../license/v6rpc \

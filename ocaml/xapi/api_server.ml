@@ -72,15 +72,7 @@ module Actions = struct
 	module Blob = Xapi_blob
 	module Message = Xapi_message
 	module Secret = Xapi_secret
-	module Credential = struct
-		let create ~__context ~username ~pword ~other_config =
-			let ref = Ref.make () in
-			let uuid = Uuid.to_string (Uuid.make_uuid ()) in
-			Db.Credential.create ~__context ~ref ~uuid ~username ~pword ~other_config;
-			ref
-
-		let destroy ~__context ~self = Db.Credential.destroy ~__context ~self
-	end
+	module Credential = Xapi_credential
 	module Tunnel = Xapi_tunnel
 end
 
