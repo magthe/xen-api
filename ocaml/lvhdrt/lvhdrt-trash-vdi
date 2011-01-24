@@ -2,7 +2,7 @@
 
 # This plugin takes a VDI uuid as a parameter and executes the following steps:
 # 1. Copies the data contents to /tmp/*trash-vdi
-# 2. Copies random data over the VDI
+# 2. Writes zeros over the VDI
 # 3. Waits for 1s
 # 4. Copies the original data contents back
 #
@@ -33,7 +33,7 @@ def trash(path):
     try:
         dd(path, tmp_path)
         try:
-            dd("/dev/urandom", path)
+            dd("/dev/zero", path)
         finally:
             # 4. Copy the original data back
             dd(tmp_path, path)

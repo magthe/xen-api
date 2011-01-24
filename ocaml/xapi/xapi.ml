@@ -194,7 +194,7 @@ let random_setup () =
   let n = 8 in
   let s = String.create n in
 
-  let chan = open_in "/dev/urandom" in
+  let chan = open_in "/dev/random" in
   Pervasiveext.finally (fun () -> really_input chan s 0 n)
     (fun () -> close_in chan);
   Random.full_init (Array.init n (fun i -> Char.code s.[i]))
